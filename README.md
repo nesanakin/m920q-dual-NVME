@@ -158,13 +158,39 @@ Main > System Summary > Here you go -- 2 NVME drives:<BR>
 ## BOOTING UBUNTU AND CHECKING IF ALL GOOD - OH YES IT IS!
 ![](https://github.com/badger707/m920q-dual-NVME/blob/main/pictures/nvme_list_and_lshw_.png)
 <br><br>
-## TROUBLESHOOTING
 
-If things didnt worked for you, here is what I'd check:
+# TROUBLESHOOTING
+
+If things didn't work for you, here is what I'd check:
+
 * Machine does not post --> you created short circuit somewhere while soldering components, find & fix.
 * Machine does post but BIOS does not show "M.2 Drive 2" option --> move resistor R150 (or R151 for M720q) as per instructions.
 * Machine does post, "M.2 Drive 2" option is available, no drive model shown/recognised --> bad solder join in one of components, or, NVME edge connector is not soldered properly. Check & re-flow suspicious joins.
-<br><br><br>
+* Machine does post, displays "M.2 Drive 2" in System Summary along with the correct model, but does not show it in the Boot Sequence settings--or there are other strange issues in the boot order like missing or disabled devices, or issues elsewhere --> it's possible that your BIOS is corrupted. See [Fixing BIOS Corruption](#fixing-bios-corruption) for how to fix this.
+
+## Fixing BIOS Corruption
+
+A normal BIOS flash will not correct BIOS corruption.
+Instead, we have to use the `SW_CLR_CMOS` mode of the motherboard, which will rewrite bad blocks in the BIOS' EEPROM.
+To do this successfully, you will need a USB CD/DVD drive, as well as a blank CD or DVD.
+Note that this process *will not work* with a USB flash drive--you need to use a USB CDROM drive.
+
+1. Download the newest BIOS [from Lenovo](https://support.lenovo.com/us/en/downloads/ds503907-flash-bios-update-thinkcentre-m720t-m720s-m720q-m920t-m920s-m920q-m920x-thinkstation-p330-tiny). You need the "BIOS Update (ISO Image Version)". As of this writing, the most recent version was released 24 Apr 2024: [m1uj977usa.iso](https://download.lenovo.com/pccbbs/thinkcentre_bios/m1uj977usa.iso)
+2. Using whatever utilities are provided by your OS or other software, burn the iso image directly to a blank CD or DVD.
+3. Boot your machine, press F1 to enter the BIOS, go to the "Startup" section, and enable CSM. In some cases this isn't necessary, but we include it here as a known reliable process.
+4. Shut down the machine and remove the top panel. On the top side of the board, look in the rear left corner next to the ethernet port for a 6-pin header with a jumper on it.
+
+![SW_CLR_CMOS Jumper](/pictures/CLR_CMOS-Jumper.jpg)
+
+5. Move the jumper from its default position (pins 5-6, marked red in the image) to the `SW_CLR_CMOS` position (pins 2-4, marked green in the image).
+6. Connect the USB CD/DVD drive to the front USB A port with the burned iso disc inserted. In some cases it will work in the rear USB ports, but we include it here as a known reliable process. If your drive has a secondary power input, connect it to a good power source.
+7. Power on the system. In the `SW_CLR_CMOS` mode, it should boot directly to the BIOS flasher. You'll see the BIOS interface with a progress bar showing the progress of the flashing. It will automatically power off once complete.
+8. Move the jumper from the `SW_CLR_CMOS` position back to its original position (pins 5-6, marked in red on the image).
+9. Reinstall the top panel.
+10. Boot! Go into the BIOS and check the Boot Sequence settings. If all has gone well, M.2 Drive 2 should be there and other strange issues should be resolved.
+
+See badger707/m920q-dual-NVME/issues/12 for further discussion of this issue.
+
 
 # FINAL NOTES
 
